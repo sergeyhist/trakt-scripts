@@ -7,7 +7,7 @@
 // @description Enable dark knight mode for trakt.tv
 // @run-at      document-start
 // @homepageURL https://github.com/sergeyhist/trakt-scripts
-// @downloadURL https://github.com/sergeyhist/trakt-scripts/trakt-dark-knight.user.js
+// @downloadURL https://github.com/sergeyhist/trakt-scripts/raw/main/trakt-dark-knight.user.js
 // ==/UserScript==
 
 setTimeout(() => {

@@ -8,7 +8,7 @@
 // @description Block ads and vip banners for trakt.tv
 // @run-at      document-start
 // @homepageURL https://github.com/sergeyhist/trakt-scripts
-// @downloadURL https://github.com/sergeyhist/trakt-scripts/trakt-adblock.user.js
+// @downloadURL https://github.com/sergeyhist/trakt-scripts/raw/main/trakt-adblock.user.js
 // ==/UserScript==
 //
 const adBlock=`
