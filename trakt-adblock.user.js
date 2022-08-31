@@ -3,7 +3,7 @@
 // @namespace   https://github.com/sergeyhist/trakt-scripts/trakt-adblock.user.js
 // @match       *://trakt.tv/*
 // @grant       GM_addStyle
-// @version     1
+// @version     1.1
 // @author      Hist
 // @description Block ads and vip banners for trakt.tv
 // @run-at      document-start
@@ -12,7 +12,7 @@
 // ==/UserScript==
 //
 const adBlock=`
-    *[id*='e20df'], *[class*='e20df'] {
+    .alert-vip-required, *[id*='e20df'], *[class*='e20df'] {
       display: none!important;
     }
 `;
