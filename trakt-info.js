@@ -26,7 +26,7 @@ addEventListener('DOMContentLoaded', () => {
         for (let studio of itemText.split(', ')) {
           let link = document.createElement('a');
           let linkName = studio.replace('Studios','').replace('Studio', '').replace(/ \+.*more/, '');
-          link.setAttribute('href', 'https://trakt.tv/search?studios='+linkName.replace(/ |:/g, '-').toLowerCase());
+          link.setAttribute('href', 'https://trakt.tv/search?studios='+linkName.replace(/ |\:|\./g, '-').toLowerCase());
           studio != itemText.split(', ')[itemText.split(',').length - 1] ? link.textContent = linkName+', ' : link.textContent = linkName;
           item.appendChild(link);
         };
