@@ -15,7 +15,7 @@ addEventListener('DOMContentLoaded', () => {
 
   for (let element of statsElememnts) {
     const infoItems = element.querySelectorAll('li');
-    const metaLang = element.querySelector('meta[itemprop="name"]').getAttribute('content');
+    const metaLang = element.querySelector('li[itemtype="http://schema.org/Country"]').querySelector('meta').getAttribute('content');
 
     function infoParser(block, type, names) {
       let lang;
@@ -25,8 +25,8 @@ addEventListener('DOMContentLoaded', () => {
         lang = metaLang;
       };
       block.querySelector('label').remove();
-      let blockText = block.textContent;
-      block.textContent = '';
+      let blockText = block.innerText;
+      block.innerText = '';
       let linkLabel = document.createElement('label');
       blockText.split(', ').length > 1 ? linkLabel.textContent = names[1] : linkLabel.textContent = names[0];
       block.appendChild(linkLabel);
@@ -37,7 +37,7 @@ addEventListener('DOMContentLoaded', () => {
         if (['languages', 'countries'].includes(type)) {
           link.setAttribute('href', 'https://trakt.tv/search?'+type+'='+lang);
         } else {
-          link.setAttribute('href', 'https://trakt.tv/search?'+type+'='+linkName.replace(/ |\:|\./g, '-').toLowerCase()); 
+          link.setAttribute('href', 'https://trakt.tv/search?'+type+'='+linkName.replace(/ |\:|\.|°/g, '-').toLowerCase()); 
         };
         link.textContent = linkName;
         block.appendChild(link);
