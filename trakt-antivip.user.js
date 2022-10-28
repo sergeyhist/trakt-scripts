@@ -2,7 +2,7 @@
 // @name        Trak.tv VipBlock
 // @namespace   https://github.com/sergeyhist/trakt-scripts/trakt-adblock.user.js
 // @match       *://trakt.tv/*
-// @version     1.0
+// @version     1.0.1
 // @author      Hist
 // @description Block vip banners and alerts on trakt.tv
 // @run-at      document-start
@@ -24,7 +24,7 @@ addEventListener('DOMContentLoaded', () => {
     node.parentElement.classList.add('hidden');
   };
 
-  document.querySelector('.brand-right').innerHTML += `<li><a href="/search">Search</a></li>`;
+  document.querySelector('.brand-right')?.innerHTML += `<li><a href="/search">Search</a></li>`;
 
   for (let node of document.querySelectorAll('.alert-vip-required')) {
     node.classList.add('hidden');
