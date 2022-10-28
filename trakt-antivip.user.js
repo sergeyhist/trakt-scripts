@@ -1,17 +1,17 @@
 // ==UserScript==
-// @name        Trak.tv AdBlock
+// @name        Trak.tv VipBlock
 // @namespace   https://github.com/sergeyhist/trakt-scripts/trakt-adblock.user.js
 // @match       *://trakt.tv/*
-// @version     1.2
+// @version     1.0
 // @author      Hist
-// @description Block ads on trakt.tv
+// @description Block vip banners and alerts on trakt.tv
 // @run-at      document-start
 // @homepageURL https://github.com/sergeyhist/trakt-scripts
-// @downloadURL https://github.com/sergeyhist/trakt-scripts/raw/main/trakt-adblock.user.js
+// @downloadURL https://github.com/sergeyhist/trakt-scripts/raw/main/trakt-vipblock.user.js
 // ==/UserScript==
 
 addEventListener('DOMContentLoaded', () => {
-  const adsIds = ['.playwire', '.snigel'];
+  const adsIds = ['a[href="/vip"]'];
   let adsNodes = [];
 
   for (let id of adsIds) {
@@ -24,7 +24,9 @@ addEventListener('DOMContentLoaded', () => {
     node.parentElement.classList.add('hidden');
   };
 
-  for (let node of document.querySelectorAll('.replace-xlg')) {
+  document.querySelector('.brand-right').innerHTML += `<li><a href="/search">Search</a></li>`;
+
+  for (let node of document.querySelectorAll('.alert-vip-required')) {
     node.classList.add('hidden');
   };
 })
