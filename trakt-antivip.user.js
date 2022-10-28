@@ -24,7 +24,9 @@ addEventListener('DOMContentLoaded', () => {
     node.parentElement.classList.add('hidden');
   };
 
-  document.querySelector('.brand-right')?.innerHTML += `<li><a href="/search">Search</a></li>`;
+  if (document.querySelector('.brand-right')) {
+    document.querySelector('.brand-right').innerHTML += `<li><a href="/search">Search</a></li>`;
+  };
 
   for (let node of document.querySelectorAll('.alert-vip-required')) {
     node.classList.add('hidden');
