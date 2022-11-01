@@ -2,7 +2,7 @@
 // @name        Trak.tv Clickable Info
 // @namespace   https://github.com/sergeyhist/trakt-scripts/trakt-dark-knight.user.js
 // @match       *://trakt.tv/*
-// @version     1.0.3
+// @version     1.0.4
 // @author      Hist
 // @description Clickable info on trakt movie/show page
 // @run-at      document-start
@@ -17,13 +17,13 @@ setInterval(() => {
     const infoItems = stats.querySelectorAll('li');
 
     function infoParser(block, type, names) {
-      if (type == 'network') {
+      if (type == 'network' && block.textContent.includes(' on ')) {
         let name = block.textContent.split(' on ').pop();
         let newBlock = document.createElement('li');
         newBlock.innerHTML = `<label>Network</label><a href='https://trakt.tv/search?networks=${name}'>${name}</a>`;
         block.innerHTML = block.innerHTML.replace(' on '+name, '');
         block.after(newBlock);
-      } else {
+      } else if (type != 'network') {
         block.querySelector('label').remove();
         let blockText = block.innerText;
         block.innerText = '';
