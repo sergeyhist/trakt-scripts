@@ -2,7 +2,7 @@
 // @name        Trak.tv Clickable Info
 // @namespace   https://github.com/sergeyhist/trakt-scripts/trakt-dark-knight.user.js
 // @match       *://trakt.tv/*
-// @version     1.0
+// @version     1.0.1
 // @author      Hist
 // @description Clickable info on trakt movie/show page
 // @run-at      document-start
@@ -61,7 +61,7 @@ setInterval(() => {
       else if (label.textContent.includes('Language')) {infoParser(item, 'languages', ['Language', 'Languages'])}
       else if (label.textContent.includes('Countr')) {infoParser(item, 'countries', ['Country', 'Countries'])}
       else if (label.textContent.includes('Network')) {infoParser(item, 'networks', ['Network', 'Networks'])}
-      else if (label.textContent.includes('Airs')) {infoParser(item, 'network')};
+      else if (['Airs', 'Premiered', 'Aired'].includes(label.textContent)) {infoParser(item, 'network')};
     };
 
     stats.classList.add('parsed');
