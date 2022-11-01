@@ -2,7 +2,7 @@
 // @name        Trak.tv Clickable Info
 // @namespace   https://github.com/sergeyhist/trakt-scripts/trakt-dark-knight.user.js
 // @match       *://trakt.tv/*
-// @version     1.0.1
+// @version     1.0.2
 // @author      Hist
 // @description Clickable info on trakt movie/show page
 // @run-at      document-start
@@ -44,7 +44,9 @@ setInterval(() => {
           } else if (type == 'networks') {
             link.setAttribute('href', 'https://trakt.tv/search?'+type+'='+linkName);
           } else {
-            link.setAttribute('href', 'https://trakt.tv/search?'+type+'='+linkName.replace(/[^0-9a-z]/gi, '-').toLowerCase()); 
+            let newLinkName = linkName.replace(/[^0-9a-z]/gi, '-').toLowerCase();
+            if (newLinkName.split('').pop() == '-') {newLinkName = newLinkName.slice(0,-1)};
+            link.setAttribute('href', 'https://trakt.tv/search?'+type+'='+newLinkName); 
           };
 
           link.textContent = linkName;
