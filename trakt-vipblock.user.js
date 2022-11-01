@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Trak.tv VipBlock
-// @namespace   https://github.com/sergeyhist/trakt-scripts/trakt-adblock.user.js
+// @namespace   https://github.com/sergeyhist/trakt-scripts/trakt-vipblock.user.js
 // @match       *://trakt.tv/*
 // @version     1.0.1
 // @author      Hist
