@@ -2,7 +2,7 @@
 // @name        Trak.tv Hidden Items
 // @namespace   https://github.com/sergeyhist/trakt-scripts/trakt-hidden.user.js
 // @match       *://trakt.tv/*
-// @version     1.1
+// @version     1.2
 // @author      Hist
 // @description Add menu elements with hidden items
 // @run-at      document-start
@@ -16,7 +16,7 @@ const listElements = ['#user-menu', '#mobile-nav'];
 
 addEventListener('DOMContentLoaded', () => {
   for (let element of linkElements) {
-    if (document.querySelector(element)) {
+    if (document.querySelector(element) && document.querySelector(element)?.querySelector('a').textContent == 'Profile') {
       for (let item of document.querySelectorAll(element)) {
         let link = document.createElement('a');
 

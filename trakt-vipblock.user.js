@@ -2,7 +2,7 @@
 // @name        Trak.tv VipBlock
 // @namespace   https://github.com/sergeyhist/trakt-scripts/trakt-vipblock.user.js
 // @match       *://trakt.tv/*
-// @version     1.1
+// @version     1.2
 // @author      Hist
 // @description Block vip banners and alerts on trakt.tv
 // @run-at      document-start
@@ -12,7 +12,7 @@
 
 addEventListener('DOMContentLoaded', () => {
   const adsIds = ['a[href="/vip"]'];
-  const adsLinks = ['a[href="/users/sergeyhist/year"]', 'a[href="/users/sergeyhist/year/all"]'];
+  const adsLinks = ['a[href="/users/sergeyhist/year"]', 'a[href="/users/sergeyhist/year/all"]', '.show-advanced-filters-link'];
   let adsNodes = [];
 
   for (let adsLink of adsLinks) {
