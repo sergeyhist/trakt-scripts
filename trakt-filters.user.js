@@ -2,15 +2,17 @@
 // @name        Trak.tv Filters
 // @namespace   https://github.com/sergeyhist/trakt-scripts/trakt-hidden.user.js
 // @match       *://trakt.tv/*
-// @version     0.1
+// @version     0.2
 // @author      Hist
 // @description Custom filters on search page
 // @run-at      document-start
 // @homepageURL https://github.com/sergeyhist/trakt-scripts
 // @downloadURL https://github.com/sergeyhist/trakt-scripts/raw/main/trakt-hidden.user.js
 // @grant       GM_addStyle
-// @grant       GM_addResourceText
-// @require     
+// @grant       GM_getResourceText
+// @resource    languageJSON https://github.com/sergeyhist/trakt-scripts/raw/main/Data/language.json
+// @resource    countryJSON https://github.com/sergeyhist/trakt-scripts/raw/main/Data/country.json
+// @resource    genreJSON https://github.com/sergeyhist/trakt-scripts/raw/main/Data/genre.json
 // ==/UserScript==
 
 GM_addStyle(`
@@ -90,23 +92,11 @@ GM_addStyle(`
   -ms-user-select: none; /* IE 10+ */
   user-select: none;
 }
-`)
+`);
 
-const traktApiKey = 'd87cd4dc7419e7be1f670003b112ccbd66c4a67e8f360c71abd7a9aef8f46e8d';
-const traktApiHeaders = {
-  'Content-Type': 'application/json',
-  'trakt-api-version': '2',
-  'trakt-api-key': traktApiKey
-};
-const traktGetList = async (url, array) => {
-  await fetch(url, {method: 'GET', headers: traktApiHeaders})
-  .then(response => response.json())
-  .then(data => {
-    for (let item of data) {
-      !array.includes(item) && array.push(item);
-    };
-  });
-}
+const genreList = JSON.parse(GM_getResourceText('genreJSON'));
+const countryList = JSON.parse(GM_getResourceText('countryJSON'));
+const languageList = JSON.parse(GM_getResourceText('languageJSON'));
 
 addEventListener('DOMContentLoaded', async () => {
   if (document.querySelector('.sidenav-inner')) {
@@ -148,17 +138,6 @@ addEventListener('DOMContentLoaded', async () => {
       };
     };
 
-    let languageList = [];
-    let countryList = [];
-    let genreList = [];
-
-    await traktGetList('https://api.trakt.tv/languages/movies', languageList);
-    await traktGetList('https://api.trakt.tv/languages/shows', languageList);
-    await traktGetList('https://api.trakt.tv/countries/movies', countryList);
-    await traktGetList('https://api.trakt.tv/countries/shows', countryList);
-    await traktGetList('https://api.trakt.tv/genres/movies', genreList);
-    await traktGetList('https://api.trakt.tv/genres/shows', genreList);
-
     let filtersBlock = document.createElement('div');
     let languageFilter = document.createElement('div');
     let countryFilter = document.createElement('div');
@@ -173,14 +152,14 @@ addEventListener('DOMContentLoaded', async () => {
     submitButton.textContent = 'Apply Filters';
 
     submitButton.onclick = () => {
-      let searchStringElements = ['https://trakt.tv/search?'];
+      let searchStringElements = [];
 
       yearFilter.querySelector('input').value && searchStringElements.push('years='+yearFilter.querySelector('input').value);
       genreFilter.querySelector('span').textContent != 'Genre' && searchStringElements.push('genres='+genreFilter.dataset.slug);
       countryFilter.querySelector('span').textContent != 'Country' && searchStringElements.push('countries='+countryFilter.dataset.slug);
       languageFilter.querySelector('span').textContent != 'Language' && searchStringElements.push('languages='+languageFilter.dataset.slug);
 
-      window.open(searchStringElements.join('&').replace('&', ''), '_self');
+      window.open((document.URL != 'https://trakt.tv/search' ? document.URL + '&' : document.URL + '?') + searchStringElements.join('&'), '_self');
     };
     
     createList(languageFilter, 'Language', languageList);
