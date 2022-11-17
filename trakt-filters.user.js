@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name        Trak.tv Filters
-// @namespace   https://github.com/sergeyhist/trakt-scripts/trakt-hidden.user.js
+// @namespace   https://github.com/sergeyhist/trakt-scripts/trakt-filters.user.js
 // @match       *://trakt.tv/*
-// @version     1.0
+// @version     1.0.1
 // @author      Hist
 // @description Custom filters on search page
 // @run-at      document-start
 // @homepageURL https://github.com/sergeyhist/trakt-scripts
-// @downloadURL https://github.com/sergeyhist/trakt-scripts/raw/main/trakt-hidden.user.js
+// @downloadURL https://github.com/sergeyhist/trakt-scripts/raw/main/trakt-filters.user.js
 // @grant       GM_addStyle
 // @grant       GM_getResourceText
 // @resource    genreJSON https://github.com/sergeyhist/trakt-scripts/raw/main/Data/genre.json
