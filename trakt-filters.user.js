@@ -9,6 +9,8 @@
 // @homepageURL https://github.com/sergeyhist/trakt-scripts
 // @downloadURL https://github.com/sergeyhist/trakt-scripts/raw/main/trakt-hidden.user.js
 // @grant       GM_addStyle
+// @grant       GM_addResourceText
+// @require     
 // ==/UserScript==
 
 GM_addStyle(`
