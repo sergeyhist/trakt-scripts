@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name        Trak.tv Filters
 // @namespace   https://github.com/sergeyhist/trakt-scripts/trakt-filters.user.js
-// @match       *://trakt.tv/*
-// @version     1.0.1
+// @match       *://trakt.tv/search*
+// @version     1.0.2
 // @author      Hist
 // @description Custom filters on search page
 // @run-at      document-start
@@ -226,12 +226,12 @@ addEventListener('DOMContentLoaded', async () => {
     createList(languageFilter, 'Language', languageList, 'languages');
     createList(networkFilter, 'Network', networkList, 'networks')
 
-    filtersBlock.append(yearFilter);
     filtersBlock.append(typeFilter);
     filtersBlock.append(genreFilter);
     filtersBlock.append(countryFilter);
     filtersBlock.append(languageFilter);
     filtersBlock.append(networkFilter);
+    filtersBlock.append(yearFilter);
     filtersBlock.append(submitButton);
     sideBar.append(filtersBlock);
   };
