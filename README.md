@@ -16,7 +16,7 @@ Replaces menu on search page with custom filters (type, genre, language, country
 Adds link with hidden movies/tv shows to the user menus (profile page and nav menu)
 + [Install](https://github.com/sergeyhist/trakt-scripts/raw/main/trakt-hidden.user.js)
 ### Clickable Info
-Makes information (such as network, genres, etc.) on movie/tv show page Clickable
+Makes information (such as network, genres, etc.) on movie/tv show page clickable
 + [Install](https://github.com/sergeyhist/trakt-scripts/raw/main/trakt-info.user.js)
 ### VipBlock
 Blocks various banners, alerts and functional elements associated with VIP
