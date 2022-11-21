@@ -2,7 +2,9 @@
 // @name        Trak.tv Filters
 // @namespace   https://github.com/sergeyhist/trakt-scripts/trakt-filters.user.js
 // @match       *://trakt.tv/search*
-// @version     1.0.2
+// @match       *://trakt.tv/movies*
+// @match       *://trakt.tv/shows*
+// @version     1.1
 // @author      Hist
 // @description Custom filters on search page
 // @run-at      document-start
@@ -17,15 +19,14 @@
 // ==/UserScript==
 
 GM_addStyle(`
+.sidenav > .sidenav-inner > nav {
+  display: none;
+}
+
 .h-filters-block {
   display: grid;
   gap: 10px;
   margin-block: 20px;
-}
-
-.h-filters-button {
-  border: 0;
-  outline: 0;
 }
 
 .h-filter-selector {
@@ -77,17 +78,25 @@ GM_addStyle(`
   cursor: pointer;
 }
 
-.h-filters-button {
+.h-filters-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.h-filters-buttons > button {
+  border: 0;
+  outline: 0;
   color: #e6e5e5bd;
-  background: linear-gradient(to bottom,#b71111b0,#131212);
   border-radius: 3px;
   padding-inline: 10px;
   padding-bottom: 4px;
   width: 100%;
+  background-color: #b110109e;
+  transition: .5s;
 }
 
-.h-filters-button:hover {
-  background: linear-gradient(to bottom,#db6b6bb0,#131212);
+.h-filters-buttons > button:hover {
+  background-color: #b1101063;
 }
 
 .h-visible {
@@ -133,76 +142,122 @@ const typeList = [
     slug: 'users'
   }
 ];
+const categoryList = [
+  {
+    name: "Trending",
+    slug: "trending"
+  },
+  {
+    name: "Popular",
+    slug: "popular"
+  },
+  {
+    name: "Recommended",
+    slug: "recommended"
+  },
+  {
+    name: "Watched",
+    slug: "watched"
+  },
+  {
+    name: "Collected",
+    slug: "collected"
+  },
+  {
+    name: "Anticipated",
+    slug: "anticipated"
+  }
+];
+const createList = (block, title, list, url) => {
+  let slug = !['All', 'Category'].includes(title) ? document.URL.includes(url+'=') && document.URL.split(url+'=').pop().split('&')[0] : document.URL.split('/')[4] && document.URL.split('/')[4].split('?')[0];
 
-addEventListener('DOMContentLoaded', async () => {
-  if (document.querySelector('.sidenav-inner')) {
-    const sideBar = document.querySelector('.sidenav-inner');
-    const createList = (block, title, list, url) => {
-      let slug = title != 'All' ? document.URL.includes(url+'=') && document.URL.split(url+'=').pop().split('&')[0] : document.URL.split('/')[4] && document.URL.split('/')[4].split('?')[0];
+  block.classList.add('h-filter-selector');
+  block.tabIndex = 0;
+  block.innerHTML = `<div class='h-filter-title unselectable'><span>${title}</span><span class='caret'></span></div><div class='h-filter-list unselectable'>`;
+  block.querySelector('.h-filter-list').innerHTML = `<div class='h-filter-option'>None</div>`;
 
-      block.classList.add('h-filter-selector');
-      block.tabIndex = 0;
-      block.innerHTML = `<div class='h-filter-title unselectable'><span>${title}</span><span class='caret'></span></div><div class='h-filter-list unselectable'>`;
-      block.querySelector('.h-filter-list').innerHTML = `<div class='h-filter-option'>None</div>`;
+  for (let item of list) {
+    let option = document.createElement('div');
 
-      for (let item of list) {
-        let option = document.createElement('div');
+    option.classList.add('h-filter-option');
+    option.dataset.slug = item.slug ? item.slug : item.code ? item.code : item.name;
+    option.textContent = item.name;
 
-        option.classList.add('h-filter-option');
-        option.dataset.slug = item.slug ? item.slug : item.code ? item.code : item.name;
-        option.textContent = item.name;
-
-        if (slug && encodeURIComponent(option.dataset.slug) == slug) {
-          block.querySelector('.h-filter-title > span').textContent = option.textContent;
-          block.dataset.slug = option.dataset.slug;
-        };
-
-        block.querySelector('.h-filter-list').append(option);
-      };
-
-      const options = block.querySelectorAll('.h-filter-option');
-
-      sideBar.querySelector('.sidenav-links').classList.add('hidden');
-
-      for (let option of options) {
-        option.onclick = () => {
-          if (option.textContent != 'None') {
-            block.querySelector('span').textContent = option.textContent;
-            block.dataset.slug = option.dataset.slug;
-          } else {
-            block.querySelector('span').textContent = title;
-          };
-        };
-      };
-
-      document.addEventListener('click', (e) => {
-        if (!block.contains(e.target) || block.querySelector('.h-filter-list').classList.contains('h-visible')) {
-          block.querySelector('.h-filter-list').classList.remove('h-visible');
-        } else {
-          block.querySelector('.h-filter-list').classList.add('h-visible');
-        };
-      });
+    if (slug && encodeURIComponent(option.dataset.slug) == slug) {
+      block.querySelector('.h-filter-title > span').textContent = option.textContent;
+      block.dataset.slug = option.dataset.slug;
     };
 
+    block.querySelector('.h-filter-list').append(option);
+  };
+
+  const options = block.querySelectorAll('.h-filter-option');
+
+  for (let option of options) {
+    option.onclick = () => {
+      if (option.textContent != 'None') {
+        block.querySelector('span').textContent = option.textContent;
+        block.dataset.slug = option.dataset.slug;
+      } else {
+        block.querySelector('span').textContent = title;
+      };
+    };
+  };
+
+  document.addEventListener('click', (e) => {
+    if (!block.contains(e.target) || block.querySelector('.h-filter-list').classList.contains('h-visible')) {
+      block.querySelector('.h-filter-list').classList.remove('h-visible');
+    } else {
+      block.querySelector('.h-filter-list').classList.add('h-visible');
+    };
+  });
+};
+
+addEventListener('DOMContentLoaded', async () => {
+  const sideBar = document.querySelector('.sidenav-inner');
+  if (sideBar) {
     let filtersBlock = document.createElement('div');
     let typeFilter = document.createElement('div');
+    let categoryFilter = document.createElement('div');
     let yearFilter = document.createElement('div');
     let genreFilter = document.createElement('div');
     let countryFilter = document.createElement('div');
     let languageFilter = document.createElement('div');
     let networkFilter = document.createElement('div');
+    let buttonsBlock = document.createElement('div');
     let submitButton = document.createElement('button');
+    let resetButton = document.createElement('button');
 
     filtersBlock.classList.add('h-filters-block');
     filtersBlock.innerHTML = `<h1 class='h-filters-title'>Filters</h1>`;
     yearFilter.innerHTML = `<input id='h-year' class="sidenav-text-field" type="text" placeholder="Years (e.g. 2019 or 2019-2022)">`;
     yearFilter.querySelector('input').value = document.URL.includes('years=') ? document.URL.split('years=').pop().split('&')[0] : '';
-    submitButton.classList.add('h-filters-button');
-    submitButton.textContent = 'Apply Filters';
-    
+    buttonsBlock.classList.add('h-filters-buttons');
+    submitButton.textContent = 'Apply';
+    resetButton.textContent = 'Reset';
+
+    createList(typeFilter, 'All', typeList);
+    createList(categoryFilter, 'Category', categoryList);
+    createList(genreFilter, 'Genre', genreList, 'genres');
+    createList(countryFilter, 'Country', countryList, 'countries');
+    createList(languageFilter, 'Language', languageList, 'languages');
+    createList(networkFilter, 'Network', networkList, 'networks')
+
+    if (document.URL.includes('/search')) {
+      filtersBlock.append(typeFilter);
+    } else {
+      filtersBlock.append(categoryFilter);
+    };
+
     submitButton.onclick = () => {
       let searchStringElements = [];
-      let contentType = typeFilter.querySelector('span').textContent != 'All' ? '/search/' + typeFilter.dataset.slug : '/search';
+      let contentType;
+
+      if (document.URL.includes('/search')) {
+        contentType = typeFilter.querySelector('span').textContent != 'All' ? '/search/' + typeFilter.dataset.slug : '/search';
+      } else {
+        contentType = '/' + document.URL.split('/')[3] + '/' + categoryFilter.dataset.slug;
+      };
 
       document.URL.includes('query=') && searchStringElements.push('query=' + document.URL.split('query=').pop().split('&')[0]);
       yearFilter.querySelector('input').value && searchStringElements.push('years=' + yearFilter.querySelector('input').value);
@@ -214,25 +269,28 @@ addEventListener('DOMContentLoaded', async () => {
       window.open('https://trakt.tv' + contentType + '?' + searchStringElements.join('&'), '_self');
     };
 
+    resetButton.onclick = () => {
+      if (document.URL.includes('/search')) {
+        window.open('https://trakt.tv/search', '_self');
+      } else {
+        window.open('https://trakt.tv/' + document.URL.split('/')[3] + '/trending', '_self');
+      };
+    };
+
     document.addEventListener('keydown', (e) => {
       if (e.key == 'Enter' && filtersBlock.contains(e.target)) {
         submitButton.dispatchEvent(new Event('click'));
       };
     });
-    
-    createList(typeFilter, 'All', typeList);
-    createList(genreFilter, 'Genre', genreList, 'genres');
-    createList(countryFilter, 'Country', countryList, 'countries');
-    createList(languageFilter, 'Language', languageList, 'languages');
-    createList(networkFilter, 'Network', networkList, 'networks')
 
-    filtersBlock.append(typeFilter);
+    buttonsBlock.append(submitButton);
+    buttonsBlock.append(resetButton);
     filtersBlock.append(genreFilter);
     filtersBlock.append(countryFilter);
     filtersBlock.append(languageFilter);
     filtersBlock.append(networkFilter);
     filtersBlock.append(yearFilter);
-    filtersBlock.append(submitButton);
+    filtersBlock.append(buttonsBlock);
     sideBar.append(filtersBlock);
   };
 })

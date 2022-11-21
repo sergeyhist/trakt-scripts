@@ -3,7 +3,7 @@
 // @namespace   https://github.com/sergeyhist/trakt-scripts/trakt-dark-knight.user.js
 // @match       *://trakt.tv/shows*
 // @match       *://trakt.tv/movies*
-// @version     2.1
+// @version     2.1.1
 // @author      Hist
 // @description Clickable info on trakt movie/show page
 // @run-at      document-start
@@ -39,47 +39,49 @@ const createInfo = (array, type, list, block) => {
 
 addEventListener('DOMContentLoaded', () => {
   const info = document.querySelector('.additional-stats');
-  const infoLabels = info.querySelectorAll('label');
-  const type = document.URL.split('/')[3];
-  const id = document.querySelector(`[data-${type.slice(0,-1)}-id]`).dataset[type.slice(0,-1)+'Id'];
-  let yearInfo = document.createElement('li');
-  let genreInfo = document.createElement('li');
-  let countryInfo = document.createElement('li');
-  let languageInfo = document.createElement('li');
-  let networkInfo = document.createElement('li');
-  let studioInfo = document.createElement('li');
+  if (info) {
+    const infoLabels = info.querySelectorAll('label');
+    const type = document.URL.split('/')[3];
+    const id = document.querySelector(`[data-${type.slice(0,-1)}-id]`).dataset[type.slice(0,-1)+'Id'];
+    let yearInfo = document.createElement('li');
+    let genreInfo = document.createElement('li');
+    let countryInfo = document.createElement('li');
+    let languageInfo = document.createElement('li');
+    let networkInfo = document.createElement('li');
+    let studioInfo = document.createElement('li');
 
-  info.append(yearInfo);
-  info.append(genreInfo);
-  info.append(countryInfo);
-  info.append(languageInfo);
-  type == 'shows' && info.append(networkInfo);
-  info.append(studioInfo);
+    info.append(yearInfo);
+    info.append(genreInfo);
+    info.append(countryInfo);
+    info.append(languageInfo);
+    type == 'shows' && info.append(networkInfo);
+    info.append(studioInfo);
 
-  for (let label of infoLabels) {['Genre', 'Genres', 'Country', 'Language', 'Studio', 'Studios', 'Network', 'Networks'].includes(label.textContent) && label.parentNode.remove()};
+    for (let label of infoLabels) {['Genre', 'Genres', 'Country', 'Language', 'Studio', 'Studios', 'Network', 'Networks'].includes(label.textContent) && label.parentNode.remove()};
 
-  fetch(`https://api.trakt.tv/${type}/${id}?extended=full`, {method: 'GET', headers: traktApiHeaders})
-    .then(response => response.json())
-    .then(data => {
-      yearInfo.innerHTML = `<label>Year</label><a href="/search?years=${data.year}">${data.year}</a>`;
-      genreInfo.innerHTML = `<label>Genres</label>`;
-      countryInfo.innerHTML = `<label>Country</label>`;
-      languageInfo.innerHTML = `<label>Language</label>`;
-      networkInfo.innerHTML = `<label>Network</label>`;
-      createInfo(data.genres, 'genres', genreList, genreInfo);
-      createInfo([data.country], 'countries', countryList, countryInfo);
-      createInfo([data.language], 'languages', languageList, languageInfo);
-      type == 'shows' && createInfo([data.network], 'networks', networkList, networkInfo);
-    });
+    fetch(`https://api.trakt.tv/${type}/${id}?extended=full`, {method: 'GET', headers: traktApiHeaders})
+      .then(response => response.json())
+      .then(data => {
+        yearInfo.innerHTML = `<label>Year</label><a href="/search?years=${data.year}">${data.year}</a>`;
+        genreInfo.innerHTML = `<label>Genres</label>`;
+        countryInfo.innerHTML = `<label>Country</label>`;
+        languageInfo.innerHTML = `<label>Language</label>`;
+        networkInfo.innerHTML = `<label>Network</label>`;
+        createInfo(data.genres, 'genres', genreList, genreInfo);
+        createInfo([data.country], 'countries', countryList, countryInfo);
+        createInfo([data.language], 'languages', languageList, languageInfo);
+        type == 'shows' && createInfo([data.network], 'networks', networkList, networkInfo);
+      });
 
-  fetch(`https://api.trakt.tv/${type}/${id}/studios`, {method: 'GET', headers: traktApiHeaders})
-    .then(response => response.json())
-    .then(data => {
-      let slugs = [];
-      
-      for (let studio of data) {slugs.push(studio.ids.slug)};
+    fetch(`https://api.trakt.tv/${type}/${id}/studios`, {method: 'GET', headers: traktApiHeaders})
+      .then(response => response.json())
+      .then(data => {
+        let slugs = [];
+        
+        for (let studio of data) {slugs.push(studio.ids.slug)};
 
-      studioInfo.innerHTML = `<label>Studio${data.length > 1 ? 's': ''}</label>`;
-      createInfo(slugs, 'studios', data, studioInfo);
-    });
+        studioInfo.innerHTML = `<label>Studio${data.length > 1 ? 's': ''}</label>`;
+        createInfo(slugs, 'studios', data, studioInfo);
+      });
+  };
 })
