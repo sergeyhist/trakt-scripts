@@ -3,7 +3,7 @@
 // @namespace   https://github.com/sergeyhist/trakt-scripts/trakt-dark-knight.user.js
 // @match       *://trakt.tv/shows*
 // @match       *://trakt.tv/movies*
-// @version     2.0
+// @version     2.0.1
 // @author      Hist
 // @description Clickable info on trakt movie/show page
 // @run-at      document-start
@@ -65,13 +65,13 @@ await fetch(`https://api.trakt.tv/${type}/${id}?extended=full`, {method: 'GET', 
   createInfo(data.genres, 'genres', genreList, genreInfo);
   createInfo([data.country], 'countries', countryList, countryInfo);
   createInfo([data.language], 'languages', languageList, languageInfo);
-  createInfo([data.network], 'networks', networkList, networkInfo);
+  type == 'shows' && createInfo([data.network], 'networks', networkList, networkInfo);
 
   info.append(yearInfo);
   info.append(genreInfo);
   info.append(countryInfo);
   info.append(languageInfo);
-  info.append(networkInfo);
+  type == 'shows' && info.append(networkInfo);
 });
 
 fetch(`https://api.trakt.tv/${type}/${id}/studios`, {method: 'GET', headers: traktApiHeaders})
