@@ -10,12 +10,12 @@ Blocks ads
 Enables dark knight mode (dark theme)
 + [Install](https://github.com/sergeyhist/trakt-scripts/raw/main/trakt-dark-knight.user.js)
 ### Search Filters
-Adds custom filters (type, genre, language, country, network and year) to the search page
+Adds custom filters (genre, country, year, etc.) to TV/Movies/Search pages
 + [Install](https://github.com/sergeyhist/trakt-scripts/raw/main/trakt-filters.user.js)
 ### Clickable Info
 Makes information (network, genres, etc.) on the movie/show page clickable
 + [Install](https://github.com/sergeyhist/trakt-scripts/raw/main/trakt-info.user.js)
 ## Other scripts for Trakt.tv
 ### Watch Now Alternative
-Repalce trakt.tv watch now modal
+Repalces default watch now modal
 + [Repo](https://github.com/sergeyhist/trakt-watch-now-alternative)
