@@ -4,7 +4,7 @@
 // @match       *://trakt.tv/search*
 // @match       *://trakt.tv/movies*
 // @match       *://trakt.tv/shows*
-// @version     1.1
+// @version     1.2
 // @author      Hist
 // @description Custom filters on search page
 // @run-at      document-start
@@ -19,14 +19,12 @@
 // ==/UserScript==
 
 GM_addStyle(`
-.sidenav > .sidenav-inner > nav {
-  display: none;
-}
-
 .h-filters-block {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
   margin-block: 20px;
+  padding: 15px 20px;
 }
 
 .h-filter-selector {
@@ -215,23 +213,36 @@ const createList = (block, title, list, url) => {
 
 addEventListener('DOMContentLoaded', async () => {
   const sideBar = document.querySelector('.sidenav-inner');
-  if (sideBar) {
+  if (sideBar && !['trakt', 'tmdb', 'tvdb', 'imdb'].includes(document.URL.split('/')[4]?.split('?')[0])) {
+    sideBar.style.display = 'none';
+
+    const searchTitle = sideBar.querySelector('h1').cloneNode(true);
+    const searchInfo = sideBar.querySelector('h2').cloneNode(true);
+
+    searchTitle.classList.add('h-filters-title');
+    searchTitle.querySelector('a[href="/vip/filtering"]').remove();
+
     let filtersBlock = document.createElement('div');
+    let searchString = document.createElement('div');
     let typeFilter = document.createElement('div');
     let categoryFilter = document.createElement('div');
-    let yearFilter = document.createElement('div');
     let genreFilter = document.createElement('div');
     let countryFilter = document.createElement('div');
     let languageFilter = document.createElement('div');
     let networkFilter = document.createElement('div');
+    let yearFilter = document.createElement('div');
+    let studioFilter = document.createElement('div');
     let buttonsBlock = document.createElement('div');
     let submitButton = document.createElement('button');
     let resetButton = document.createElement('button');
 
     filtersBlock.classList.add('h-filters-block');
-    filtersBlock.innerHTML = `<h1 class='h-filters-title'>Filters</h1>`;
+    searchString.innerHTML = `<input id='h-search' class="sidenav-text-field" type="text" placeholder="What are you looking for?">`;
+    searchString.querySelector('input').value = document.URL.includes('query=') ? document.URL.split('query=').pop().split('&')[0] : '';
     yearFilter.innerHTML = `<input id='h-year' class="sidenav-text-field" type="text" placeholder="Years (e.g. 2019 or 2019-2022)">`;
     yearFilter.querySelector('input').value = document.URL.includes('years=') ? document.URL.split('years=').pop().split('&')[0] : '';
+    studioFilter.innerHTML = `<input id='h-studio' class="sidenav-text-field" type="text" placeholder="Studio name (e.g. Amazon Studios)">`;
+    studioFilter.querySelector('input').value = document.URL.includes('studios=') ? document.URL.split('studios=').pop().split('&')[0] : '';
     buttonsBlock.classList.add('h-filters-buttons');
     submitButton.textContent = 'Apply';
     resetButton.textContent = 'Reset';
@@ -243,6 +254,10 @@ addEventListener('DOMContentLoaded', async () => {
     createList(languageFilter, 'Language', languageList, 'languages');
     createList(networkFilter, 'Network', networkList, 'networks')
 
+    filtersBlock.append(searchTitle);
+    filtersBlock.append(searchInfo);
+    filtersBlock.append(searchString);
+
     if (document.URL.includes('/search')) {
       filtersBlock.append(typeFilter);
     } else {
@@ -250,8 +265,12 @@ addEventListener('DOMContentLoaded', async () => {
     };
 
     submitButton.onclick = () => {
-      let searchStringElements = [];
       let contentType;
+      let searchStringElements = [];
+      let studioElement = studioFilter.querySelector('input').value.toLowerCase().replace(/[^a-z0-9]/gi, '-').replace(/\-+/g, '-');
+
+      studioElement = studioElement[studioElement.length - 1] == '-' ? studioElement.slice(0,-1) : studioElement;
+      studioElement = studioElement[0] == '-' ? studioElement.slice(1) : studioElement;
 
       if (document.URL.includes('/search')) {
         contentType = typeFilter.querySelector('span').textContent != 'All' ? '/search/' + typeFilter.dataset.slug : '/search';
@@ -259,8 +278,9 @@ addEventListener('DOMContentLoaded', async () => {
         contentType = '/' + document.URL.split('/')[3] + '/' + categoryFilter.dataset.slug;
       };
 
-      document.URL.includes('query=') && searchStringElements.push('query=' + document.URL.split('query=').pop().split('&')[0]);
+      searchString.querySelector('input').value && searchStringElements.push('query=' + searchString.querySelector('input').value);
       yearFilter.querySelector('input').value && searchStringElements.push('years=' + yearFilter.querySelector('input').value);
+      studioFilter.querySelector('input').value && searchStringElements.push('studios=' + encodeURIComponent(studioElement));
       genreFilter.querySelector('span').textContent != 'Genre' && searchStringElements.push('genres=' + genreFilter.dataset.slug);
       countryFilter.querySelector('span').textContent != 'Country' && searchStringElements.push('countries=' + countryFilter.dataset.slug);
       languageFilter.querySelector('span').textContent != 'Language' && searchStringElements.push('languages=' + languageFilter.dataset.slug);
@@ -290,7 +310,8 @@ addEventListener('DOMContentLoaded', async () => {
     filtersBlock.append(languageFilter);
     filtersBlock.append(networkFilter);
     filtersBlock.append(yearFilter);
+    filtersBlock.append(studioFilter);
     filtersBlock.append(buttonsBlock);
-    sideBar.append(filtersBlock);
+    sideBar.before(filtersBlock);
   };
 })
