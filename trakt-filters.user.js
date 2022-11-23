@@ -4,7 +4,7 @@
 // @match       *://trakt.tv/search*
 // @match       *://trakt.tv/movies*
 // @match       *://trakt.tv/shows*
-// @version     1.3.1
+// @version     1.3.2
 // @author      Hist
 // @description Custom filters on search page
 // @run-at      document-start
@@ -42,6 +42,7 @@ GM_addStyle(`
   max-width: 1000px;
   padding: 15px 20px 20px;
   background-color: #1d1d1d;
+  color: white;
 }
 
 .h-filters-content > h1, .h-filters-content > h2 {
@@ -400,7 +401,7 @@ addEventListener('DOMContentLoaded', async () => {
         genreFilter.querySelector('span').textContent != 'Genre' && searchStringElements.push('genres=' + genreFilter.dataset.slug);
         countryFilter.querySelector('span').textContent != 'Country' && searchStringElements.push('countries=' + countryFilter.dataset.slug);
         languageFilter.querySelector('span').textContent != 'Language' && searchStringElements.push('languages=' + languageFilter.dataset.slug);
-        document.URL.split('?')[0].includes('shows') && networkFilter.querySelector('span').textContent != 'Network' && searchStringElements.push('networks=' + networkFilter.dataset.slug);
+        !document.URL.split('?')[0].includes('movies') && networkFilter.querySelector('span').textContent != 'Network' && searchStringElements.push('networks=' + networkFilter.dataset.slug);
         yearFilter.querySelector('input').value && searchStringElements.push('years=' + yearFilter.querySelector('input').value);
         studioFilter.querySelector('input').value && searchStringElements.push('studios=' + encodeURIComponent(studioElement));
       };
@@ -428,7 +429,7 @@ addEventListener('DOMContentLoaded', async () => {
       filtersContent.append(genreFilter);
       filtersContent.append(countryFilter);
       filtersContent.append(languageFilter);
-      document.URL.split('?')[0].includes('shows') && filtersContent.append(networkFilter);
+      !document.URL.split('?')[0].includes('movies') && filtersContent.append(networkFilter);
       filtersContent.append(yearFilter);
       filtersContent.append(studioFilter);
     };
