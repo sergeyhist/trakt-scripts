@@ -4,7 +4,7 @@
 // @match       *://trakt.tv/search*
 // @match       *://trakt.tv/movies*
 // @match       *://trakt.tv/shows*
-// @version     1.3
+// @version     1.3.1
 // @author      Hist
 // @description Custom filters on search page
 // @run-at      document-start
@@ -179,15 +179,15 @@ GM_addStyle(`
 
 @media (width > 1024px) and (height < 700px) {
   .frame-wrapper .frame {
-    margin-left: 0;
-    margin-top: 0;
+    margin-left: 0!important;
+    margin-top: 0!important;
   }
 
   .frame-wrapper .frame .no-results {
-    position: initial;
-    transform: none;
-    -ms-transform: none;
-    -webkit-transform: none;
+    position: initial!important;
+    transform: none!important;
+    -ms-transform: none!important;
+    -webkit-transform: none!important;
   }
 
   .h-filters-nav {
