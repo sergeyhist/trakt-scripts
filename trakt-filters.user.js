@@ -4,7 +4,7 @@
 // @match       *://trakt.tv/search*
 // @match       *://trakt.tv/movies*
 // @match       *://trakt.tv/shows*
-// @version     1.2
+// @version     1.3
 // @author      Hist
 // @description Custom filters on search page
 // @run-at      document-start
@@ -19,12 +19,61 @@
 // ==/UserScript==
 
 GM_addStyle(`
-.h-filters-block {
+.sidenav {
+  display: none;
+}
+
+.h-filters-nav {
+  display: flex;
+  justify-content: center;
+  height: 700px;
+  width: 300px;
+  float: left;
+  margin-top: 50px;
+}
+
+.h-filters-content {
+  z-index: 2;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-block: 20px;
-  padding: 15px 20px;
+  position: fixed;
+  width: 300px;
+  max-width: 1000px;
+  padding: 15px 20px 20px;
+  background-color: #1d1d1d;
+}
+
+.h-filters-content > h1, .h-filters-content > h2 {
+  margin: 0;
+  padding: 0;
+}
+
+.h-filters-content > h1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 36px;
+}
+
+.h-filters-content > h1 > span:nth-child(2) {
+  font-size: 25px;
+}
+
+.h-filters-content > h2 {
+  font-size: 16px;
+  margin-block: 5px;
+}
+
+.h-filters-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.h-filters-wrapper > div {
+  font-size: 20px;
+  margin-top: 6px;
 }
 
 .h-filter-selector {
@@ -61,6 +110,7 @@ GM_addStyle(`
   transition: .3s;
   max-height: 0;
   overflow-y: scroll;
+  overscroll-behavior: contain;
 }
 
 .h-filter-list > div:not(:last-child) {
@@ -108,12 +158,74 @@ GM_addStyle(`
   -ms-user-select: none; /* IE 10+ */
   user-select: none;
 }
+
+@media (0 < width < 1025px) {
+  .h-filters-nav {
+    float: none;
+    width: auto;
+    height: auto;
+  }
+
+  .h-filters-block {
+    min-height: auto;
+  }
+
+  .h-filters-content {
+    position: initial;
+    width: 100%;
+    height: auto;
+  }
+}
+
+@media (width > 1024px) and (height < 700px) {
+  .frame-wrapper .frame {
+    margin-left: 0;
+    margin-top: 0;
+  }
+
+  .frame-wrapper .frame .no-results {
+    position: initial;
+    transform: none;
+    -ms-transform: none;
+    -webkit-transform: none;
+  }
+
+  .h-filters-nav {
+    float: none;
+    width: auto;
+    height: auto;
+  }
+
+  .h-filters-block {
+    min-height: auto;
+  }
+
+  .h-filters-content {
+    position: initial;
+    width: 100%;
+    height: auto;
+  }
+}
 `);
 
 const genreList = JSON.parse(GM_getResourceText('genreJSON'));
 const countryList = JSON.parse(GM_getResourceText('countryJSON'));
 const languageList = JSON.parse(GM_getResourceText('languageJSON'));
 const networkList = JSON.parse(GM_getResourceText('networkJSON'));
+const linkTypes = [
+  {
+    name: 'Movies',
+    slug: 'movies'
+  },
+  {
+    name: 'TV Shows',
+    slug: 'shows'
+  },
+  {
+    name: 'Search',
+    slug: 'search'
+  }
+];
 const typeList = [
   {
     name: 'Movies',
@@ -189,9 +301,7 @@ const createList = (block, title, list, url) => {
     block.querySelector('.h-filter-list').append(option);
   };
 
-  const options = block.querySelectorAll('.h-filter-option');
-
-  for (let option of options) {
+  for (let option of block.querySelectorAll('.h-filter-option')) {
     option.onclick = () => {
       if (option.textContent != 'None') {
         block.querySelector('span').textContent = option.textContent;
@@ -212,17 +322,23 @@ const createList = (block, title, list, url) => {
 };
 
 addEventListener('DOMContentLoaded', async () => {
-  const sideBar = document.querySelector('.sidenav-inner');
-  if (sideBar && !['trakt', 'tmdb', 'tvdb', 'imdb'].includes(document.URL.split('/')[4]?.split('?')[0])) {
-    sideBar.style.display = 'none';
+  const sideNav = document.querySelector('.sidenav-inner');
 
-    const searchTitle = sideBar.querySelector('h1').cloneNode(true);
-    const searchInfo = sideBar.querySelector('h2').cloneNode(true);
+  if (sideNav && !['trakt', 'tmdb', 'tvdb', 'imdb'].includes(document.URL.split('/')[4]?.split('?')[0])) {
+    const searchTitle = sideNav.querySelector('h1')?.cloneNode(true);
+    const searchInfo = sideNav.querySelector('h2')?.cloneNode(true);
+    const prevElement = searchTitle.querySelector('.prev')?.cloneNode(true);
+    const nextElement = searchTitle.querySelector('.next')?.cloneNode(true);
+    const dropdownElement = searchTitle.querySelector('span.dropdown.filter-dropdown')?.cloneNode(true);
 
-    searchTitle.classList.add('h-filters-title');
-    searchTitle.querySelector('a[href="/vip/filtering"]').remove();
+    searchTitle.innerHTML = `<span class="h-filters-wrapper">`;
+    searchTitle.append(dropdownElement);
+    prevElement && searchTitle.querySelector('.h-filters-wrapper').append(prevElement);
+    searchTitle.querySelector('.h-filters-wrapper').append(document.createTextNode((linkTypes.find(element => element.slug == document.URL.split('/')[3].split('?')[0]).name)));
+    nextElement && searchTitle.querySelector('.h-filters-wrapper').append(nextElement);
 
-    let filtersBlock = document.createElement('div');
+    let filtersNav = document.createElement('div');
+    let filtersContent = document.createElement('div');
     let searchString = document.createElement('div');
     let typeFilter = document.createElement('div');
     let categoryFilter = document.createElement('div');
@@ -236,9 +352,10 @@ addEventListener('DOMContentLoaded', async () => {
     let submitButton = document.createElement('button');
     let resetButton = document.createElement('button');
 
-    filtersBlock.classList.add('h-filters-block');
+    filtersNav.classList.add('h-filters-nav');
+    filtersContent.classList.add('h-filters-content');
     searchString.innerHTML = `<input id='h-search' class="sidenav-text-field" type="text" placeholder="What are you looking for?">`;
-    searchString.querySelector('input').value = document.URL.includes('query=') ? document.URL.split('query=').pop().split('&')[0] : '';
+    searchString.querySelector('input').value = document.URL.includes('query=') ? decodeURIComponent(document.URL.split('query=').pop().split('&')[0]?.replace(/\+/g, '%20')) : '';
     yearFilter.innerHTML = `<input id='h-year' class="sidenav-text-field" type="text" placeholder="Years (e.g. 2019 or 2019-2022)">`;
     yearFilter.querySelector('input').value = document.URL.includes('years=') ? document.URL.split('years=').pop().split('&')[0] : '';
     studioFilter.innerHTML = `<input id='h-studio' class="sidenav-text-field" type="text" placeholder="Studio name (e.g. Amazon Studios)">`;
@@ -254,14 +371,14 @@ addEventListener('DOMContentLoaded', async () => {
     createList(languageFilter, 'Language', languageList, 'languages');
     createList(networkFilter, 'Network', networkList, 'networks')
 
-    filtersBlock.append(searchTitle);
-    filtersBlock.append(searchInfo);
-    filtersBlock.append(searchString);
+    filtersContent.append(searchTitle);
+    filtersContent.append(searchInfo);
+    filtersContent.append(searchString);
 
     if (document.URL.includes('/search')) {
-      filtersBlock.append(typeFilter);
+      filtersContent.append(typeFilter);
     } else {
-      filtersBlock.append(categoryFilter);
+      filtersContent.append(categoryFilter);
     };
 
     submitButton.onclick = () => {
@@ -278,13 +395,15 @@ addEventListener('DOMContentLoaded', async () => {
         contentType = '/' + document.URL.split('/')[3] + '/' + categoryFilter.dataset.slug;
       };
 
-      searchString.querySelector('input').value && searchStringElements.push('query=' + searchString.querySelector('input').value);
-      yearFilter.querySelector('input').value && searchStringElements.push('years=' + yearFilter.querySelector('input').value);
-      studioFilter.querySelector('input').value && searchStringElements.push('studios=' + encodeURIComponent(studioElement));
-      genreFilter.querySelector('span').textContent != 'Genre' && searchStringElements.push('genres=' + genreFilter.dataset.slug);
-      countryFilter.querySelector('span').textContent != 'Country' && searchStringElements.push('countries=' + countryFilter.dataset.slug);
-      languageFilter.querySelector('span').textContent != 'Language' && searchStringElements.push('languages=' + languageFilter.dataset.slug);
-      networkFilter.querySelector('span').textContent != 'Network' && searchStringElements.push('networks=' + networkFilter.dataset.slug);
+      searchString.querySelector('input').value && searchStringElements.push('query=' + encodeURIComponent(searchString.querySelector('input').value).replace(/%20/g, '+'));
+      if (!['lists', 'users', 'people'].includes(contentType?.split('/')[2])) {
+        genreFilter.querySelector('span').textContent != 'Genre' && searchStringElements.push('genres=' + genreFilter.dataset.slug);
+        countryFilter.querySelector('span').textContent != 'Country' && searchStringElements.push('countries=' + countryFilter.dataset.slug);
+        languageFilter.querySelector('span').textContent != 'Language' && searchStringElements.push('languages=' + languageFilter.dataset.slug);
+        document.URL.split('?')[0].includes('shows') && networkFilter.querySelector('span').textContent != 'Network' && searchStringElements.push('networks=' + networkFilter.dataset.slug);
+        yearFilter.querySelector('input').value && searchStringElements.push('years=' + yearFilter.querySelector('input').value);
+        studioFilter.querySelector('input').value && searchStringElements.push('studios=' + encodeURIComponent(studioElement));
+      };
 
       window.open('https://trakt.tv' + contentType + '?' + searchStringElements.join('&'), '_self');
     };
@@ -298,20 +417,23 @@ addEventListener('DOMContentLoaded', async () => {
     };
 
     document.addEventListener('keydown', (e) => {
-      if (e.key == 'Enter' && filtersBlock.contains(e.target)) {
+      if (e.key == 'Enter' && filtersContent.contains(e.target)) {
         submitButton.dispatchEvent(new Event('click'));
       };
     });
 
     buttonsBlock.append(submitButton);
-    buttonsBlock.append(resetButton);
-    filtersBlock.append(genreFilter);
-    filtersBlock.append(countryFilter);
-    filtersBlock.append(languageFilter);
-    filtersBlock.append(networkFilter);
-    filtersBlock.append(yearFilter);
-    filtersBlock.append(studioFilter);
-    filtersBlock.append(buttonsBlock);
-    sideBar.before(filtersBlock);
+    if (!['lists', 'users', 'people'].includes(document.URL.split('/')[4]?.split('?')[0])) {
+      buttonsBlock.append(resetButton);
+      filtersContent.append(genreFilter);
+      filtersContent.append(countryFilter);
+      filtersContent.append(languageFilter);
+      document.URL.split('?')[0].includes('shows') && filtersContent.append(networkFilter);
+      filtersContent.append(yearFilter);
+      filtersContent.append(studioFilter);
+    };
+    filtersContent.append(buttonsBlock);
+    filtersNav.append(filtersContent);
+    sideNav.parentElement.before(filtersNav);
   };
 })
