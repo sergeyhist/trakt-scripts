@@ -17,5 +17,5 @@ Makes information (network, genres, etc.) on the movie/show page clickable
 + [Install](https://github.com/sergeyhist/trakt-scripts/raw/main/trakt-info.user.js)
 ## Other scripts for Trakt.tv
 ### Watch Now Alternative
-Repalces default watch now modal
+Adds alternative version of watch now modal and buttons
 + [Repo](https://github.com/sergeyhist/trakt-watch-now-alternative)

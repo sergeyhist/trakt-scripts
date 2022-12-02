@@ -3,7 +3,7 @@
 // @namespace   https://github.com/sergeyhist/trakt-scripts/trakt-dark-knight.user.js
 // @match       *://trakt.tv/shows*
 // @match       *://trakt.tv/movies*
-// @version     2.1.1
+// @version     2.1.2
 // @author      Hist
 // @description Clickable info on trakt movie/show page
 // @run-at      document-start
@@ -62,15 +62,25 @@ addEventListener('DOMContentLoaded', () => {
     fetch(`https://api.trakt.tv/${type}/${id}?extended=full`, {method: 'GET', headers: traktApiHeaders})
       .then(response => response.json())
       .then(data => {
-        yearInfo.innerHTML = `<label>Year</label><a href="/search?years=${data.year}">${data.year}</a>`;
-        genreInfo.innerHTML = `<label>Genres</label>`;
-        countryInfo.innerHTML = `<label>Country</label>`;
-        languageInfo.innerHTML = `<label>Language</label>`;
-        networkInfo.innerHTML = `<label>Network</label>`;
-        createInfo(data.genres, 'genres', genreList, genreInfo);
-        createInfo([data.country], 'countries', countryList, countryInfo);
-        createInfo([data.language], 'languages', languageList, languageInfo);
-        type == 'shows' && createInfo([data.network], 'networks', networkList, networkInfo);
+        if (data.year) {
+          yearInfo.innerHTML = `<label>Year</label><a href="/search?years=${data.year}">${data.year}</a>`;
+        } else {yearInfo.style.display = 'none'};
+        if (data.genres) {
+          genreInfo.innerHTML = `<label>Genres</label>`;
+          createInfo(data.genres, 'genres', genreList, genreInfo);
+        } else {genreInfo.style.display = 'none'};
+        if (data.country) {
+          countryInfo.innerHTML = `<label>Country</label>`;
+          createInfo([data.country], 'countries', countryList, countryInfo);
+        } else {countryInfo.style.display = 'none'};
+        if (data.language) {
+          languageInfo.innerHTML = `<label>Language</label>`;
+          createInfo([data.language], 'languages', languageList, languageInfo);
+        } else {languageInfo.style.display = 'none'};
+        if (data.network && type == 'shows') {
+          networkInfo.innerHTML = `<label>Network</label>`;
+          createInfo([data.network], 'networks', networkList, networkInfo);
+        } else {networkInfo.style.display = 'none'};
       });
 
     fetch(`https://api.trakt.tv/${type}/${id}/studios`, {method: 'GET', headers: traktApiHeaders})
@@ -80,8 +90,10 @@ addEventListener('DOMContentLoaded', () => {
         
         for (let studio of data) {slugs.push(studio.ids.slug)};
 
-        studioInfo.innerHTML = `<label>Studio${data.length > 1 ? 's': ''}</label>`;
-        createInfo(slugs, 'studios', data, studioInfo);
+        if (slugs.length) {
+          studioInfo.innerHTML = `<label>Studio${data.length > 1 ? 's': ''}</label>`;
+          createInfo(slugs, 'studios', data, studioInfo);
+        } else {studioInfo.style.display = 'none'};
       });
   };
 })
