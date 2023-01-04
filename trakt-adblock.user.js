@@ -2,7 +2,7 @@
 // @name        Trak.tv AdBlock
 // @namespace   https://github.com/sergeyhist/trakt-scripts/trakt-adblock.user.js
 // @match       *://trakt.tv/*
-// @version     1.3
+// @version     1.3.1
 // @author      Hist
 // @description Block ads on trakt.tv
 // @run-at      document-start
@@ -19,11 +19,11 @@ setInterval(() => {
     !element.parentElement.classList.contains('hidden') && element.parentElement.classList.add('hidden');
   };
 
-  for (let element of document.querySelectorAll('[class^="snigel-"]')) {
+  for (let element of document.querySelectorAll('[class^="snigel-adhesive"]')) {
     !element.classList.contains('hidden') && element.classList.add('hidden');
   };
 
   for (let element of document.querySelectorAll('.replace-xlg')) {
     !element.classList.contains('hidden') && element.classList.add('hidden');
   };
-}, 500)
+}, 100)
