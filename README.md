@@ -3,9 +3,6 @@
 + Any userscript manager.   
 (Recommended: [Tampermonkey](https://addons.mozilla.org/ru/firefox/addon/tampermonkey/))
 ## Userscripts
-### Adblock
-Blocks ads 
-+ [Install](https://github.com/sergeyhist/trakt-scripts/raw/main/trakt-adblock.user.js)
 ### Dark-Knight
 Enables dark knight mode (dark theme)
 + [Install](https://github.com/sergeyhist/trakt-scripts/raw/main/trakt-dark-knight.user.js)
