@@ -4,7 +4,7 @@
 // @match       *://trakt.tv/search*
 // @match       *://trakt.tv/movies*
 // @match       *://trakt.tv/shows*
-// @version     1.3.2
+// @version     1.3.3
 // @author      Hist
 // @description Custom filters on search page
 // @run-at      document-start
@@ -333,7 +333,7 @@ addEventListener('DOMContentLoaded', async () => {
     const dropdownElement = searchTitle.querySelector('span.dropdown.filter-dropdown')?.cloneNode(true);
 
     searchTitle.innerHTML = `<span class="h-filters-wrapper">`;
-    searchTitle.append(dropdownElement);
+    dropdownElement && searchTitle.append(dropdownElement);
     prevElement && searchTitle.querySelector('.h-filters-wrapper').append(prevElement);
     searchTitle.querySelector('.h-filters-wrapper').append(document.createTextNode((linkTypes.find(element => element.slug == document.URL.split('/')[3].split('?')[0]).name)));
     nextElement && searchTitle.querySelector('.h-filters-wrapper').append(nextElement);
